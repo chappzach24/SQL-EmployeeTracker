@@ -1,6 +1,6 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const inquirer = require("inquirer");
-require("console.table");
+// require("console.table");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -25,4 +25,16 @@ function questions() {
 				"Update employee role",
 				"Quit",
 			]
-		}]);
+		}
+  ]
+)
+
+  .then((answer) =>{
+    console.log(answer);
+    if (answer.options == "View all Departments"){
+      console.log("Query all departments");
+      questions();
+    }
+  })}
+
+  questions();

@@ -1,4 +1,4 @@
-USE employeesDB
+USE employeesDB;
 
 INSERT INTO department (name)
 VALUES ("Marketing"), ("Engineering"), ("HR");

@@ -8,13 +8,13 @@ use employeesDB;
 
 CREATE Table department(
   --generate a unique identity 
-  id INT NOT NULL AUTO_INCEREMENT,
+  id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(30) NOT NULL,
-  PRIMARY KEY (ID);
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE role(
-  id INT NOT NULL AUTO_INCEREMENT,
+  id INT AUTO_INCREMENT,
   title VARCHAR(30),
   salary DECIMAL,
   department_id int,
@@ -25,7 +25,7 @@ CREATE TABLE role(
 );
 
 CREATE TABLE employees(
-  id INT NOT NULL AUTO_INCEREMENT,
+  id INT NOT NULL AUTO_INCREMENT,
   first_name VARCHAR(30),
   last_name VARCHAR(30),
   role_id int,
