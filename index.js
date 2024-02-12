@@ -1,6 +1,13 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-// require("console.table");
+const express = require('express');
+
+const PORT = process.env.PORT || 3001;
+const app = express();
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -31,10 +38,32 @@ function questions() {
 
   .then((answer) =>{
     console.log(answer);
-    if (answer.options == "View all Departments"){
-      console.log("Query all departments");
-      questions();
+    if (answer.options === "View all Departments"){
+      viewAllDepartments();
     }
+
+    if (answer.options === "View all roles"){
+      viewAllRoles();
+    }
+    
+    
   })}
 
+  function viewAllDepartments() {
+    const query = "SELECT * FROM department";
+    connection.query(query, (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      questions(); // Ask the next question
+    });
+  }
+
+  function viewAllRoles() {
+    const query = "SELECT * FROM role";
+    connection.query(query, (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      questions(); // Ask the next question
+    });
+  }
   questions();

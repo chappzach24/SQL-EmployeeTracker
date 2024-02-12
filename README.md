@@ -25,3 +25,14 @@ THEN I am prompted to enter the employee’s first name, last name, role, and ma
 
 WHEN I choose to update an employee role
 THEN I am prompted to select an employee to update and their new role and this information is updated in the database
+
+
+
+
+
+
+
+
+
+--SELECT role.id, role.title, role.salary, department.name FROM ROLE LEFT JOIN department ON ROLE.department_id = department.id;--
+--SELECT employees.id, employees.first_name, employees.last_name, role.title FROM employees LEFT JOIN ROLE ON employees.role_id = role.id;--

@@ -4,10 +4,8 @@ CREATE DATABASE employeesDB;
 use employeesDB;
 
 
---Tables
 
 CREATE Table department(
-  --generate a unique identity 
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(30) NOT NULL,
   PRIMARY KEY (id)
@@ -15,11 +13,11 @@ CREATE Table department(
 
 CREATE TABLE role(
   id INT AUTO_INCREMENT,
-  title VARCHAR(30),
+  title VARCHAR(30) NOT NULL,
   salary DECIMAL,
   department_id int,
   PRIMARY key (id),
-  FOREIGN KEY (department_id
+  FOREIGN KEY (department_id)
   REFERENCES department(ID)
   ON DELETE SET NULL
 );
@@ -38,3 +36,4 @@ CREATE TABLE employees(
   REFERENCES employees(id)
   on DELETE set null
 );
+
