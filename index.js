@@ -199,47 +199,7 @@ function addRole() {
 
 
   function updateEmployees() {
-    //get a list of employees
-    connection.query("SELECT * FROM employees", (err, employees) => {
-      if (err) throw err;
-  
-      
-      const employeeChoices = employees.map((employee) => ({
-        name: `${employee.first_name} ${employee.last_name}`,
-        value: employee.id,
-      }));
-  
-      inquirer
-        .prompt([
-          {
-            type: "list",
-            name: "employeeId",
-            message: "Select the employee you want to update:",
-            choices: employeeChoices,
-          },
-          {
-            type: "input",
-            name: "newRoleId",
-            message: "Enter the new role ID for this employee:",
-          },
-        ])
-        .then((answers) => {
-          console.log(answers);
-          // Update the employee's role in the database
-          connection.query(
-            "UPDATE employees SET ? WHERE ?",
-            [
-              { role_id: answers.newRoleId },
-              { id: answers.employeeId },
-            ],
-            (err, res) => {
-              if (err) throw err;
-              console.log("Employee role updated successfully");
-              questions(); // Prompt main questions again
-            }
-          );
-        });
-    });
+    
   }
   
 
