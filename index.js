@@ -1,13 +1,5 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
-const express = require('express');
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -45,7 +37,30 @@ function questions() {
     if (answer.options === "View all roles"){
       viewAllRoles();
     }
-    
+
+    if (answer.options === "View all employees"){
+      viewAllEmployees()
+    }
+
+    if (answer.options === "Add department"){
+      addDepartment()
+    }
+
+    if (answer.options === "Add role"){
+      addRole()
+    }
+
+    if (answer.options === "Add employee"){
+      addEmployees()
+    }
+
+    if (answer.options === "Update employee role"){
+      updateEmployees()
+    }
+
+    if (answer.options === "Quit"){
+      quit()
+    }
     
   })}
 
@@ -66,4 +81,18 @@ function questions() {
       questions(); // Ask the next question
     });
   }
+
+  function viewAllEmployees() {
+    const query = "SELECT * from employees";
+    connection.query(query, (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      questions(); // Ask the next question
+    });
+  }
+
+
+
+
+
   questions();
