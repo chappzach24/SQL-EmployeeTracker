@@ -8,8 +8,9 @@ var connection = mysql.createConnection({
   password: "1725",
   database: "employeesDB",
 });
-
+displayTables();
 function questions() {
+ 
   inquirer
     .prompt([
       {
@@ -65,6 +66,31 @@ function questions() {
     });
 }
 
+function displayTables() {
+  const query = `
+  SELECT 
+    e.id AS 'Employee ID',
+    e.first_name AS 'First Name',
+    e.last_name AS 'Last Name',
+    r.title AS 'Role',
+    r.salary AS 'Salary',
+    d.name AS 'Department',
+    CONCAT(m.first_name, ' ', m.last_name) AS 'Manager'
+  FROM 
+    employees e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON r.department_id = d.id
+    LEFT JOIN employees m ON e.manager_id = m.id
+`;
+
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.log("Employees and Roles Table:");
+    console.table(results);
+    // questions(); If you want it to loop none stop just commit this back in...
+  });
+}
+
 function viewAllDepartments() {
   const query = "SELECT * FROM department";
   connection.query(query, (err, results) => {
@@ -110,7 +136,6 @@ function addDepartment() {
           if (err) throw err;
           console.log("Added new department");
           questions();
-          
         }
       );
     });
@@ -153,55 +178,97 @@ function addRole() {
     });
 }
 
+function addEmployees() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "Enter the first name of the employee:",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "Enter the last name of the employee:",
+      },
+      {
+        type: "input",
+        name: "role_id",
+        message: "Enter the role ID for this employee:",
+      },
+      {
+        type: "input",
+        name: "manager_id",
+        message: "Enter the manager ID for this employee (if applicable):",
+      },
+    ])
+    .then((answer) => {
+      console.log(answer);
+      connection.query(
+        "INSERT INTO employees SET ?",
+        {
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: answer.role_id,
+          manager_id: answer.manager_id || null,
+        },
+        (err, res) => {
+          if (err) throw err;
+          console.log("Added new employee");
+          questions();
+        }
+      );
+    });
+}
 
-  function addEmployees() {
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "first_name",
-          message: "Enter the first name of the employee:",
-        },
-        {
-          type: "input",
-          name: "last_name",
-          message: "Enter the last name of the employee:",
-        },
-        {
-          type: "input",
-          name: "role_id",
-          message: "Enter the role ID for this employee:",
-        },
-        {
-          type: "input",
-          name: "manager_id",
-          message: "Enter the manager ID for this employee (if applicable):",
-        },
-      ])
-      .then((answer) => {
-        console.log(answer);
-        connection.query(
-          "INSERT INTO employees SET ?",
+function updateEmployees() {
+  // Fetching the list of employees and roles from the database
+  const employeeQuery = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM employees";
+  const roleQuery = "SELECT id, title FROM role";
+
+  connection.query(employeeQuery, (err, employeeResults) => {
+    if (err) throw err;
+
+    connection.query(roleQuery, (err, roleResults) => {
+      if (err) throw err;
+
+      // Prompting to select an employee and their new role
+      inquirer
+        .prompt([
           {
-            first_name: answer.first_name,
-            last_name: answer.last_name,
-            role_id: answer.role_id,
-            manager_id: answer.manager_id || null, 
+            type: "list",
+            name: "employeeId",
+            message: "Select the employee you want to update:",
+            choices: employeeResults.map(employee => ({
+              name: employee.full_name,
+              value: employee.id
+            }))
           },
-          (err, res) => {
-            if (err) throw err;
-            console.log("Added new employee");
-            questions();
+          {
+            type: "list",
+            name: "newRoleId",
+            message: "Select the new role for the employee:",
+            choices: roleResults.map(role => ({
+              name: role.title,
+              value: role.id
+            }))
           }
-        );
-      });
-  }
+        ])
+        .then((answers) => {
+          const { employeeId, newRoleId } = answers;
 
+          // Updating the employee's role in the database
+          const updateQuery = "UPDATE employees SET role_id = ? WHERE id = ?";
+          connection.query(updateQuery, [newRoleId, employeeId], (err, result) => {
+            if (err) throw err;
+            console.log(`Employee with ID ${employeeId} has been updated with the new role ID ${newRoleId}`);
+            questions(); // Ask the next question
+          });
+        });
+    });
+  });
+}
 
-  function updateEmployees() {
-    
-  }
-  
 
 function quit() {
   const query = "SELECT * from employees";
