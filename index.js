@@ -271,11 +271,7 @@ function updateEmployees() {
 
 
 function quit() {
-  const query = "SELECT * from employees";
-  connection.query(query, (err, results) => {
-    if (err) throw err;
-    return "";
-  });
+  connection.end();
 }
 
 questions();
