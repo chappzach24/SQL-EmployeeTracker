@@ -1,4 +1,4 @@
-# QL Employee Tracker
+# SQL Employee Tracker
 The SQL Employee Tracker is a command-line tool designed to streamline the management of employees, roles, and departments within a company. Built with Node.js and MySQL, this application offers robust data management capabilities, effortless data manipulation, a user-friendly interface, and flexible configuration options.
 
 [Video on how to use this app](https://drive.google.com/file/d/1cbSC5qEoN64eYZ2eSvcHGcX2s_j2C2Xs/view?usp=sharing)
