@@ -10,7 +10,6 @@ var connection = mysql.createConnection({
 });
 displayTables();
 function questions() {
- 
   inquirer
     .prompt([
       {
@@ -21,8 +20,11 @@ function questions() {
           "View all Departments",
           "View all roles",
           "View all employees",
+          "Delete employee",
           "Add department",
+          "Delete department",
           "Add role",
+          "Delete role",
           "Add employee",
           "Update employee role",
           "Quit",
@@ -59,7 +61,17 @@ function questions() {
       if (answer.options === "Update employee role") {
         updateEmployees();
       }
+      if (answer.options === "Delete department") {
+        deleteDepartment();
+      }
 
+      if (answer.options === "Delete role") {
+        deleteRole();
+      }
+
+      if (answer.options === "Delete employee") {
+        deleteEmployee();
+      }
       if (answer.options === "Quit") {
         quit();
       }
@@ -223,7 +235,8 @@ function addEmployees() {
 
 function updateEmployees() {
   // Fetching the list of employees and roles from the database
-  const employeeQuery = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM employees";
+  const employeeQuery =
+    "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM employees";
   const roleQuery = "SELECT id, title FROM role";
 
   connection.query(employeeQuery, (err, employeeResults) => {
@@ -239,36 +252,56 @@ function updateEmployees() {
             type: "list",
             name: "employeeId",
             message: "Select the employee you want to update:",
-            choices: employeeResults.map(employee => ({
+            choices: employeeResults.map((employee) => ({
               name: employee.full_name,
-              value: employee.id
-            }))
+              value: employee.id,
+            })),
           },
           {
             type: "list",
             name: "newRoleId",
             message: "Select the new role for the employee:",
-            choices: roleResults.map(role => ({
+            choices: roleResults.map((role) => ({
               name: role.title,
-              value: role.id
-            }))
-          }
+              value: role.id,
+            })),
+          },
         ])
         .then((answers) => {
           const { employeeId, newRoleId } = answers;
 
           // Updating the employee's role in the database
           const updateQuery = "UPDATE employees SET role_id = ? WHERE id = ?";
-          connection.query(updateQuery, [newRoleId, employeeId], (err, result) => {
-            if (err) throw err;
-            console.log(`Employee with ID ${employeeId} has been updated with the new role ID ${newRoleId}`);
-            questions(); // Ask the next question
-          });
+          connection.query(
+            updateQuery,
+            [newRoleId, employeeId],
+            (err, result) => {
+              if (err) throw err;
+              console.log(
+                `Employee with ID ${employeeId} has been updated with the new role ID ${newRoleId}`
+              );
+              questions(); // Ask the next question
+            }
+          );
         });
     });
   });
 }
 
+function deleteDepartment() {
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "departmentId",
+      message: "Enter the ID of the dapartment you want to delete:",
+    },
+  ]).then((answer) => {
+    const { departmentid } = answer;
+
+    const query = "DELETE FROM department WHERE id = ?";
+    connection.query()
+  })
+}
 
 function quit() {
   connection.end();
