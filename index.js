@@ -204,46 +204,71 @@ function addRole() {
 }
 
 function addEmployees() {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "first_name",
-        message: "Enter the first name of the employee:",
-      },
-      {
-        type: "input",
-        name: "last_name",
-        message: "Enter the last name of the employee:",
-      },
-      {
-        type: "input",
-        name: "role_id",
-        message: "Enter the role ID for this employee:",
-      },
-      {
-        type: "input",
-        name: "manager_id",
-        message: "Enter the manager ID for this employee (if applicable):",
-      },
-    ])
-    .then((answer) => {
-      console.log(answer);
-      connection.query(
-        "INSERT INTO employees SET ?",
-        {
-          first_name: answer.first_name,
-          last_name: answer.last_name,
-          role_id: answer.role_id,
-          manager_id: answer.manager_id || null,
-        },
-        (err, res) => {
-          if (err) throw err;
-          console.log("Added new employee");
-          questions();
-        }
-      );
+  //gets roles
+  const roleQuery = "SELECT id, title FROM role";
+  // gets list of
+  const managerQuery =
+    "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM employees";
+
+  connection.query(roleQuery, (err, roleResults) => {
+    if (err) throw err;
+
+    connection.query(managerQuery, (err, managerResults) => {
+      if (err) throw err;
+
+      const roleChoices = roleResults.map((role) => ({
+        name: role.title,
+        value: role.id,
+      }));
+      const managerChoices = managerResults.map((manager) => ({
+        name: manager.full_name,
+        value: manager.id,
+      }));
+
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "first_name",
+            message: "Enter the first name of the employee:",
+          },
+          {
+            type: "input",
+            name: "last_name",
+            message: "Enter the last name of the employee:",
+          },
+          {
+            type: "list",
+            name: "role_id",
+            message: "Whats the role for this employee:",
+            choices: roleChoices,
+          },
+          {
+            type: "list",
+            name: "manager_id",
+            message: "Enter the manager ID for this employee (if applicable):",
+            choices: [...managerChoices, { name: "None", value: null }],
+          },
+        ])
+        .then((answer) => {
+          console.log(answer);
+          connection.query(
+            "INSERT INTO employees SET ?",
+            {
+              first_name: answer.first_name,
+              last_name: answer.last_name,
+              role_id: answer.role_id,
+              manager_id: answer.manager_id || null,
+            },
+            (err, res) => {
+              if (err) throw err;
+              console.log("Added new employee");
+              questions();
+            }
+          );
+        });
     });
+  });
 }
 
 function updateEmployees() {
