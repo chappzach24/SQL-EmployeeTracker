@@ -8,7 +8,32 @@ var connection = mysql.createConnection({
   password: "1725",
   database: "employeesDB",
 });
-displayTables();
+
+function displayTables() {
+  const query = `
+  SELECT 
+    e.id AS 'Employee ID',
+    e.first_name AS 'First Name',
+    e.last_name AS 'Last Name',
+    r.title AS 'Role',
+    r.salary AS 'Salary',
+    d.name AS 'Department',
+    CONCAT(m.first_name, ' ', m.last_name) AS 'Manager'
+FROM 
+    employees e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON r.department_id = d.id
+    LEFT JOIN employees m ON e.manager_id = m.id;
+`;
+
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.log("Employees and Roles Table:");
+    console.table(results);
+    questions();
+  });
+}
+
 function questions() {
   inquirer
     .prompt([
@@ -20,12 +45,12 @@ function questions() {
           "View all Departments",
           "View all roles",
           "View all employees",
-          "Delete employee",
           "Add department",
-          "Delete department",
           "Add role",
-          "Delete role",
           "Add employee",
+          "Delete department",
+          "Delete employee",
+          "Delete role",
           "Update employee role",
           "Quit",
         ],
@@ -78,30 +103,7 @@ function questions() {
     });
 }
 
-function displayTables() {
-  const query = `
-  SELECT 
-    e.id AS 'Employee ID',
-    e.first_name AS 'First Name',
-    e.last_name AS 'Last Name',
-    r.title AS 'Role',
-    r.salary AS 'Salary',
-    d.name AS 'Department',
-    CONCAT(m.first_name, ' ', m.last_name) AS 'Manager'
-FROM 
-    employees e
-    LEFT JOIN role r ON e.role_id = r.id
-    LEFT JOIN department d ON r.department_id = d.id
-    LEFT JOIN employees m ON e.manager_id = m.id;
-`;
 
-  connection.query(query, (err, results) => {
-    if (err) throw err;
-    console.log("Employees and Roles Table:");
-    console.table(results);
-    // questions(); If you want it to loop none stop just commit this back in...
-  });
-}
 
 function viewAllDepartments() {
   const query = "SELECT * FROM department";
@@ -159,7 +161,7 @@ function addDepartment() {
       {
         type: "input",
         name: "department",
-        message: "What is the name of the department you would like to add",
+        message: "What is the name of the department you would like to add: ",
       },
     ])
     .then((answer) => {
@@ -177,40 +179,50 @@ function addDepartment() {
 }
 
 function addRole() {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "title",
-        message: "Enter the title of the role:",
-      },
-      {
-        type: "input",
-        name: "salary",
-        message: "Enter the salary for this role:",
-      },
-      {
-        type: "input",
-        name: "department_id",
-        message: "Enter the department ID for this role:",
-      },
-    ])
-    .then((answer) => {
-      console.log(answer);
-      connection.query(
-        "INSERT INTO role SET ?",
+  //get list from database
+  const departmentQuery = "SELECT id, name FROM department";
+
+  connection.query(departmentQuery, (err, departmentResults) => {
+    if (err) throw err;
+
+    const departmentChoices = departmentResults.map(department => ({ name: department.name, value: department.id }));
+
+    inquirer
+      .prompt([
         {
-          title: answer.title,
-          salary: answer.salary,
-          department_id: answer.department_id,
+          type: "input",
+          name: "title",
+          message: "Enter the title of the role:",
         },
-        (err, res) => {
-          if (err) throw err;
-          console.log("Added new role");
-          questions();
-        }
-      );
-    });
+        {
+          type: "input",
+          name: "salary",
+          message: "Enter the salary for this role:",
+        },
+        {
+          type: "list",
+          name: "department_id",
+          message: "What department does this belong under?:",
+          choices: departmentChoices,
+        },
+      ])
+      .then((answer) => {
+        console.log(answer);
+        connection.query(
+          "INSERT INTO role SET ?",
+          {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: answer.department_id,
+          },
+          (err, res) => {
+            if (err) throw err;
+            console.log("Added new role");
+            questions();
+          }
+        );
+      });
+  });
 }
 
 function addEmployees() {
@@ -427,4 +439,5 @@ function quit() {
   connection.end();
 }
 
-questions();
+displayTables();
+
