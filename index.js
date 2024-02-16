@@ -88,11 +88,11 @@ function displayTables() {
     r.salary AS 'Salary',
     d.name AS 'Department',
     CONCAT(m.first_name, ' ', m.last_name) AS 'Manager'
-  FROM 
+FROM 
     employees e
     LEFT JOIN role r ON e.role_id = r.id
     LEFT JOIN department d ON r.department_id = d.id
-    LEFT JOIN employees m ON e.manager_id = m.id
+    LEFT JOIN employees m ON e.manager_id = m.id;
 `;
 
   connection.query(query, (err, results) => {
@@ -122,7 +122,20 @@ function viewAllRoles() {
 }
 
 function viewAllEmployees() {
-  const query = "SELECT * from employees";
+  const query = `
+  SELECT 
+      e.first_name AS 'First Name',
+      e.last_name AS 'Last Name',
+      r.title AS 'Role',
+      d.name AS 'Department',
+      r.salary AS 'Salary',
+      CONCAT(m.first_name, ' ', m.last_name) AS 'Manager Name'
+  FROM 
+      employees e
+      LEFT JOIN role r ON e.role_id = r.id
+      LEFT JOIN department d ON r.department_id = d.id
+      LEFT JOIN employees m ON e.manager_id = m.id;
+`;
   connection.query(query, (err, results) => {
     if (err) throw err;
     console.table(results);
