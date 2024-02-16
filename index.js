@@ -289,18 +289,90 @@ function updateEmployees() {
 }
 
 function deleteDepartment() {
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "departmentId",
-      message: "Enter the ID of the dapartment you want to delete:",
-    },
-  ]).then((answer) => {
-    const { departmentid } = answer;
+  const query = "SELECT * FROM department";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
 
-    const query = "DELETE FROM department WHERE id = ?";
-    connection.query()
-  })
+    console.log("Departments:");
+    console.table(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "departmentId",
+          message: "Enter the ID of the department you want to delete:",
+        },
+      ])
+      .then((answer) => {
+        const { departmentId } = answer;
+
+        const deleteQuery = "DELETE FROM department WHERE id = ?";
+        connection.query(deleteQuery, [departmentId], (err, result) => {
+          if (err) throw err;
+          console.log(`Department with ID ${departmentId} has been deleted`);
+          questions(); // Ask the next question
+        });
+      });
+  });
+}
+
+function deleteRole() {
+  const query = "SELECT * FROM role";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+
+    console.log("Roles:");
+    console.table(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "roleId",
+          message: "Enter the ID of the role you want to delete:",
+        },
+      ])
+      .then((answer) => {
+        const { roleId } = answer;
+
+        const deleteQuery = "DELETE FROM role WHERE id = ?";
+        connection.query(deleteQuery, [roleId], (err, result) => {
+          if (err) throw err;
+          console.log(`Role with ID ${roleId} has been deleted`);
+          questions(); // Ask the next question
+        });
+      });
+  });
+}
+
+function deleteEmployee() {
+  const query = "SELECT * FROM employees";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+
+    console.log("Employees:");
+    console.table(results);
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "employeeId",
+          message: "Enter the ID of the employee you want to delete:",
+        },
+      ])
+      .then((answer) => {
+        const { employeeId } = answer;
+
+        const deleteQuery = "DELETE FROM employees WHERE id = ?";
+        connection.query(deleteQuery, [employeeId], (err, result) => {
+          if (err) throw err;
+          console.log(`Employee with ID ${employeeId} has been deleted`);
+          questions(); // Ask the next question
+        });
+      });
+  });
 }
 
 function quit() {
