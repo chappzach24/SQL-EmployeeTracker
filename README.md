@@ -2,8 +2,10 @@
 
 The Employee Management System is a command-line tool that simplifies the management of employees, roles, and departments within a company. It offers comprehensive data management, effortless data manipulation, a user-friendly interface, flexible configuration options, and reliability thanks to its Node.js and MySQL technology stack. It provides functionalities such as viewing, adding, updating, and deleting departments, roles, and employees.
 
+[Video on how to use this app](https://drive.google.com/file/d/1cbSC5qEoN64eYZ2eSvcHGcX2s_j2C2Xs/view?usp=sharing)
+
 ## Installation
-Clone the repository:
+Clone the repository: git clone git@github.com:chappzach24/SQL-EmployeeTracker.git
 
 bash
 Copy code
